@@ -3,24 +3,62 @@ package com.uc.employeepayroll.service;
 import com.uc.employeepayroll.dto.EmployeeDTO;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 @Service
 public class EmployeeService {
 
-    public String addEmployee(EmployeeDTO employee){
-        EmployeeDTO employeeDTO = new EmployeeDTO();
+    List<EmployeeDTO> store = new ArrayList<>();
 
-        employeeDTO.setName(employee.getName());
-        employeeDTO.setSalary(employee.getSalary());
+    public List<String> getAllEmployee(){
+        List<String> nameOfEmployee = new ArrayList<>();
+
+        for(EmployeeDTO emp : store){
+            nameOfEmployee.add(emp.getName());
+        }
+
+        return nameOfEmployee;
+    }
+
+    public String getEmployee(Long id){
+        for(EmployeeDTO emp : store){
+            if (Objects.equals(emp.getId(), id)){
+                return emp.getName();
+            }
+        }
+        return null;
+    }
+
+    public String addEmployee(EmployeeDTO employee){
+
+        store.add(employee);
 
         return employee.getName();
     }
 
     public String updateEmployee(Long id, EmployeeDTO employee){
-        EmployeeDTO employeeDTO = new EmployeeDTO();
 
-        employeeDTO.setName(employee.getName());
-        employeeDTO.setSalary(employee.getSalary());
+        for(EmployeeDTO emp : store){
+            if(Objects.equals(emp.getId(), id)){
+                emp.setName(employee.getName());
+                emp.setSalary(employee.getSalary());
+                return employee.getName();
+            }
+        }
 
-        return employee.getName();
+        return null;
+    }
+
+    public String deleteEmployee(Long id){
+        for(EmployeeDTO emp : store){
+            if (Objects.equals(emp.getId(), id)){
+                store.remove(emp);
+                return emp.getName();
+            }
+        }
+        // return null if employee is not found
+        return null;
     }
 }
