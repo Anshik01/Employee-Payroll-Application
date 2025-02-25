@@ -1,6 +1,7 @@
 package com.uc.employeepayroll.dto;
 
 public class EmployeeDTO {
+    private Long id;
     private String name;
     private double salary;
 
@@ -18,5 +19,13 @@ public class EmployeeDTO {
 
     public void setSalary(double salary) {
         this.salary = salary;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }
