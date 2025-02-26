@@ -3,6 +3,7 @@ package com.uc.employeepayroll.controller;
 
 import com.uc.employeepayroll.dto.EmployeeDTO;
 import com.uc.employeepayroll.service.EmployeeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 public class EmployeeController {
 
@@ -19,6 +21,7 @@ public class EmployeeController {
     @GetMapping("/all")
     public ResponseEntity<List<String>> getAllEmployee(){
         // print all employees name
+        log.info("All employees are printed");
         return new ResponseEntity<>(employeeService.getAllEmployee() , HttpStatus.OK);
     }
 
@@ -29,16 +32,19 @@ public class EmployeeController {
 
         // return name of the employee if exist in list
         if(name != null){
+            log.info("Employee with name {} is printed", name);
             return new ResponseEntity<>("Searched for employee : " + name, HttpStatus.OK);
         }
 
-        return new ResponseEntity<>("Searched employee is not present!!", HttpStatus.OK);
+        log.error("Employee doesn't exist");
+        return new ResponseEntity<>("Searched employee is not present!!", HttpStatus.NOT_FOUND);
     }
 
     // adding new employee
     @PostMapping("/post")
     public ResponseEntity<String> postEmployee(@RequestBody EmployeeDTO employee){
         // print name of added employee
+        log.info("{} has been added to the list", employee.getName());
         return new ResponseEntity<>("Employee created : " + employeeService.addEmployee(employee), HttpStatus.CREATED);
     }
 
@@ -50,11 +56,13 @@ public class EmployeeController {
 
         // print name of employee record updated
         if(name != null){
+            log.info("Employee info has been updated.");
             return new ResponseEntity<>("Updated employee: " + name, HttpStatus.OK);
         }
 
         // if record doesn't exist then return this message
-        return new ResponseEntity<>("Employee id does not exist!!", HttpStatus.OK);
+        log.error("Employee doesn't exist hence can't edit");
+        return new ResponseEntity<>("Employee id does not exist!!", HttpStatus.NOT_FOUND);
     }
 
     @DeleteMapping("/delete/{id}")
@@ -64,10 +72,12 @@ public class EmployeeController {
 
         // print name of employee record deleted
         if(name != null){
+            log.info("Employee data has been deleted.");
             return new ResponseEntity<>("Deleted employee : " + name, HttpStatus.OK);
         }
 
         // if record doesn't exist then return this message
-        return new ResponseEntity<>("Data of the searched employee doesn't exist.", HttpStatus.OK);
+        log.error("Employee doesn't exist hence can't delete");
+        return new ResponseEntity<>("Data of the searched employee doesn't exist.", HttpStatus.NOT_FOUND);
     }
 }
