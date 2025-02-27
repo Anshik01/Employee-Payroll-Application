@@ -2,6 +2,7 @@ package com.uc.employeepayroll.controller;
 
 
 import com.uc.employeepayroll.dto.EmployeeDTO;
+import com.uc.employeepayroll.exception.EmployeeNotFoundException;
 import com.uc.employeepayroll.service.EmployeeService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -29,18 +30,15 @@ public class EmployeeController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<String> getEmployee(@PathVariable Long id){
+    public ResponseEntity<String> getEmployee(@PathVariable Long id) throws EmployeeNotFoundException {
         // searching in list if the id is present in tha list
         String name = employeeService.getEmployee(id);
 
         // return name of the employee if exist in list
-        if(name != null){
-            log.info("Employee with name {} is printed", name);
-            return new ResponseEntity<>("Searched for employee : " + name, HttpStatus.OK);
-        }
 
-        log.error("Employee doesn't exist");
-        return new ResponseEntity<>("Searched employee is not present!!", HttpStatus.NOT_FOUND);
+        log.info("Employee with name {} is printed", name);
+        return new ResponseEntity<>("Searched for employee : " + name, HttpStatus.OK);
+
     }
 
     // adding new employee
@@ -53,35 +51,26 @@ public class EmployeeController {
 
     @PutMapping("/put/{id}")
     public ResponseEntity<String> putEmployee(@PathVariable Long id,
-                                              @Valid @RequestBody EmployeeDTO employee){
+                                              @Valid @RequestBody EmployeeDTO employee) throws EmployeeNotFoundException {
 
         // update employee given by data given by user
         String name = employeeService.updateEmployee(id, employee);
 
         // print name of employee record updated
-        if(name != null){
-            log.info("Employee info has been updated.");
-            return new ResponseEntity<>("Updated employee: " + name, HttpStatus.OK);
-        }
 
-        // if record doesn't exist then return this message
-        log.error("Employee doesn't exist hence can't edit");
-        return new ResponseEntity<>("Employee id does not exist!!", HttpStatus.NOT_FOUND);
+        log.info("Employee info has been updated.");
+        return new ResponseEntity<>("Updated employee: " + name, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteEmployee(@PathVariable Long id){
+    public ResponseEntity<String> deleteEmployee(@PathVariable Long id) throws EmployeeNotFoundException {
         // deleting the employee
         String name = employeeService.deleteEmployee(id);
 
         // print name of employee record deleted
-        if(name != null){
-            log.info("Employee data has been deleted.");
-            return new ResponseEntity<>("Deleted employee : " + name, HttpStatus.OK);
-        }
 
-        // if record doesn't exist then return this message
-        log.error("Employee doesn't exist hence can't delete");
-        return new ResponseEntity<>("Data of the searched employee doesn't exist.", HttpStatus.NOT_FOUND);
+        log.info("Employee data has been deleted.");
+        return new ResponseEntity<>("Deleted employee : " + name, HttpStatus.OK);
+
     }
 }

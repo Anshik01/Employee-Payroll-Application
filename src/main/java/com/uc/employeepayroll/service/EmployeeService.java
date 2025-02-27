@@ -1,6 +1,7 @@
 package com.uc.employeepayroll.service;
 
 import com.uc.employeepayroll.dto.EmployeeDTO;
+import com.uc.employeepayroll.exception.EmployeeNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -24,13 +25,14 @@ public class EmployeeService {
         return nameOfEmployee;
     }
 
-    public String getEmployee(Long id){
+    public String getEmployee(Long id) throws EmployeeNotFoundException {
         for(EmployeeDTO emp : store){
             if (Objects.equals(emp.getId(), id)){
                 return emp.getName();
             }
         }
-        return null;
+        // throw exception if employee is not found
+        throw new EmployeeNotFoundException("Employee does not exist");
     }
 
     public String addEmployee(EmployeeDTO employee){
@@ -40,7 +42,7 @@ public class EmployeeService {
         return employee.getName();
     }
 
-    public String updateEmployee(Long id, EmployeeDTO employee){
+    public String updateEmployee(Long id, EmployeeDTO employee) throws EmployeeNotFoundException {
 
         for(EmployeeDTO emp : store){
             if(Objects.equals(emp.getId(), id)){
@@ -49,18 +51,18 @@ public class EmployeeService {
                 return employee.getName();
             }
         }
-
-        return null;
+        // throw exception if employee is not found
+        throw new EmployeeNotFoundException("Employee does not exist");
     }
 
-    public String deleteEmployee(Long id){
+    public String deleteEmployee(Long id) throws EmployeeNotFoundException {
         for(EmployeeDTO emp : store){
             if (Objects.equals(emp.getId(), id)){
                 store.remove(emp);
                 return emp.getName();
             }
         }
-        // return null if employee is not found
-        return null;
+        // throw exception if employee is not found
+        throw new EmployeeNotFoundException("Employee does not exist");
     }
 }
