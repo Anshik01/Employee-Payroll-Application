@@ -10,6 +10,7 @@ import java.util.Objects;
 @Service
 public class EmployeeService {
 
+    // using list to store data of all employee
     List<EmployeeDTO> store = new ArrayList<>();
 
     public List<String> getAllEmployee(){
@@ -19,6 +20,7 @@ public class EmployeeService {
             nameOfEmployee.add(emp.getName());
         }
 
+        // returning name of all employees present in data
         return nameOfEmployee;
     }
 
