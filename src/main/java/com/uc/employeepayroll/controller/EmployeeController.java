@@ -3,16 +3,19 @@ package com.uc.employeepayroll.controller;
 
 import com.uc.employeepayroll.dto.EmployeeDTO;
 import com.uc.employeepayroll.service.EmployeeService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @Slf4j
 @RestController
+@Validated
 public class EmployeeController {
 
     @Autowired
@@ -42,7 +45,7 @@ public class EmployeeController {
 
     // adding new employee
     @PostMapping("/post")
-    public ResponseEntity<String> postEmployee(@RequestBody EmployeeDTO employee){
+    public ResponseEntity<String> postEmployee(@Valid @RequestBody EmployeeDTO employee){
         // print name of added employee
         log.info("{} has been added to the list", employee.getName());
         return new ResponseEntity<>("Employee created : " + employeeService.addEmployee(employee), HttpStatus.CREATED);
@@ -50,7 +53,8 @@ public class EmployeeController {
 
     @PutMapping("/put/{id}")
     public ResponseEntity<String> putEmployee(@PathVariable Long id,
-                                              @RequestBody EmployeeDTO employee){
+                                              @Valid @RequestBody EmployeeDTO employee){
+
         // update employee given by data given by user
         String name = employeeService.updateEmployee(id, employee);
 
