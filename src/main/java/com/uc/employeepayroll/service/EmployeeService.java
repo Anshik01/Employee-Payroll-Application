@@ -2,7 +2,11 @@ package com.uc.employeepayroll.service;
 
 import com.uc.employeepayroll.dto.EmployeeDTO;
 import com.uc.employeepayroll.exception.EmployeeNotFoundException;
+import com.uc.employeepayroll.model.EmployeeModel;
+import com.uc.employeepayroll.repository.EmployeeRepo;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -12,6 +16,10 @@ import java.util.Objects;
 @Service
 @Slf4j
 public class EmployeeService {
+
+    @Autowired
+    private EmployeeRepo employeeRepo;
+    private ModelMapper modelMapper = new ModelMapper();
 
     // using list to store data of all employee
     List<EmployeeDTO> store = new ArrayList<>();
@@ -41,8 +49,8 @@ public class EmployeeService {
     }
 
     public String addEmployee(EmployeeDTO employee){
-
-        store.add(employee);
+        EmployeeModel employeeModel = modelMapper.map(employee, EmployeeModel.class);
+        employeeRepo.save(employeeModel);
 
         log.info("Given employee has been added to the database");
         return employee.getName();
