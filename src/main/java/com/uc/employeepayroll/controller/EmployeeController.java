@@ -23,21 +23,21 @@ public class EmployeeController {
     private EmployeeService employeeService;
 
     @GetMapping("/all")
-    public ResponseEntity<List<String>> getAllEmployee(){
+    public ResponseEntity<List<EmployeeDTO>> getAllEmployee(){
         // print all employees name
         log.info("All employees are printed");
         return new ResponseEntity<>(employeeService.getAllEmployee() , HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<String> getEmployee(@PathVariable Long id) throws EmployeeNotFoundException {
+    public ResponseEntity<EmployeeDTO> getEmployee(@PathVariable Long id) throws EmployeeNotFoundException {
         // searching in list if the id is present in tha list
-        String name = employeeService.getEmployee(id);
+        EmployeeDTO name = employeeService.getEmployee(id);
 
         // return name of the employee if exist in list
 
         log.info("Employee with name {} is printed", name);
-        return new ResponseEntity<>("Searched for employee : " + name, HttpStatus.OK);
+        return new ResponseEntity<>(name, HttpStatus.OK);
 
     }
 
@@ -49,28 +49,33 @@ public class EmployeeController {
         return new ResponseEntity<>("Employee created : " + employeeService.addEmployee(employee), HttpStatus.CREATED);
     }
 
+
+
     @PutMapping("/put/{id}")
-    public ResponseEntity<String> putEmployee(@PathVariable Long id,
+    public ResponseEntity<EmployeeDTO> putEmployee(@PathVariable Long id,
                                               @Valid @RequestBody EmployeeDTO employee) throws EmployeeNotFoundException {
 
         // update employee given by data given by user
-        String name = employeeService.updateEmployee(id, employee);
+        EmployeeDTO name = employeeService.updateEmployee(id, employee);
 
         // print name of employee record updated
 
         log.info("Employee info has been updated.");
-        return new ResponseEntity<>("Updated employee: " + name, HttpStatus.OK);
+        return new ResponseEntity<>(name, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteEmployee(@PathVariable Long id) throws EmployeeNotFoundException {
         // deleting the employee
-        String name = employeeService.deleteEmployee(id);
+        boolean isDeleted = employeeService.deleteEmployee(id);
 
-        // print name of employee record deleted
-
-        log.info("Employee data has been deleted.");
-        return new ResponseEntity<>("Deleted employee : " + name, HttpStatus.OK);
-
+        if(isDeleted){
+            log.info("Employee data has been deleted.");
+            return new ResponseEntity<>("Employee has been deleted.", HttpStatus.OK);
+        }
+        else{
+            log.info("Employee data has not been deleted.");
+            return new ResponseEntity<>("Employee has not been delted.", HttpStatus.BAD_REQUEST);
+        }
     }
 }

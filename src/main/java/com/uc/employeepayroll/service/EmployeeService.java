@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -22,30 +23,34 @@ public class EmployeeService {
     private ModelMapper modelMapper = new ModelMapper();
 
     // using list to store data of all employee
-    List<EmployeeDTO> store = new ArrayList<>();
+    List<EmployeeModel> employeeList = new ArrayList<>();
 
-    public List<String> getAllEmployee(){
-        List<String> nameOfEmployee = new ArrayList<>();
+    public List<EmployeeDTO> getAllEmployee(){
+        employeeList = employeeRepo.findAll();
 
-        for(EmployeeDTO emp : store){
-            nameOfEmployee.add(emp.getName());
+        if (!employeeList.isEmpty()) {
+            List<EmployeeDTO> employeeDTOList = new ArrayList<>();
+            log.info("GET ALL EMPLOYEES");
+
+            for(EmployeeModel employeeModel: employeeList){
+                employeeDTOList.add(modelMapper.map(employeeModel,EmployeeDTO.class));
+            }
+            return employeeDTOList;
+        } else {
+            log.warn("NO EMPLOYEES FOUND");
+            return null;
         }
-
-        // returning name of all employees present in data
-        log.info("Return list of all employee");
-        return nameOfEmployee;
     }
 
-    public String getEmployee(Long id) throws EmployeeNotFoundException {
-        for(EmployeeDTO emp : store){
-            if (Objects.equals(emp.getId(), id)){
-                log.info("Searched employee has been returned");
-                return emp.getName();
-            }
+    public EmployeeDTO getEmployee(Long id) throws EmployeeNotFoundException {
+        log.info("GET EMPLOYEE BY ID");
+        Optional<EmployeeModel> employeeEntity = employeeRepo.findById(id);
+        if (employeeEntity.isPresent()) {
+            return modelMapper.map(employeeEntity.get(), EmployeeDTO.class);
+        } else {
+            log.warn("Employee with ID: {} not found", id);
+            throw new EmployeeNotFoundException("Employee not found");
         }
-        // throw exception if employee is not found
-        log.error("Can't find employee");
-        throw new EmployeeNotFoundException("Employee does not exist");
     }
 
     public String addEmployee(EmployeeDTO employee){
@@ -56,31 +61,28 @@ public class EmployeeService {
         return employee.getName();
     }
 
-    public String updateEmployee(Long id, EmployeeDTO employee) throws EmployeeNotFoundException {
+    public EmployeeDTO updateEmployee(Long id, EmployeeDTO employee) throws EmployeeNotFoundException {
+        Optional<EmployeeModel> existingEmployeeOpt = employeeRepo.findById(id);
 
-        for(EmployeeDTO emp : store){
-            if(Objects.equals(emp.getId(), id)){
-                emp.setName(employee.getName());
-                emp.setSalary(employee.getSalary());
-                log.info("Updated the employee");
-                return employee.getName();
-            }
+        if(existingEmployeeOpt.isPresent()){
+            EmployeeModel existEmployee = existingEmployeeOpt.get();
+            modelMapper.map(employee, existEmployee);
+            EmployeeModel updatedEmployee = employeeRepo.save(existEmployee);
+            log.info("UPDATED EMPLOYEE");
+            return modelMapper.map(updatedEmployee, EmployeeDTO.class);
         }
         // throw exception if employee is not found
         log.error("Employee can't found");
         throw new EmployeeNotFoundException("Employee does not exist");
     }
 
-    public String deleteEmployee(Long id) throws EmployeeNotFoundException {
-        for(EmployeeDTO emp : store){
-            if (Objects.equals(emp.getId(), id)){
-                store.remove(emp);
-                log.info("Employee has been deleted");
-                return emp.getName();
-            }
+    public boolean deleteEmployee(long id) {
+        if (employeeRepo.existsById(id)) {
+            employeeRepo.deleteById(id);
+            log.info("DELETED EMPLOYEE");
+            return true;
         }
-        // throw exception if employee is not found
-        log.error("Employee can't be found");
-        throw new EmployeeNotFoundException("Employee does not exist");
+        log.warn("EMPLOYEE NOT FOUND");
+        return false;
     }
 }
